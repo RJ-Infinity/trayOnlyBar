@@ -28,10 +28,6 @@ namespace trayOnlyBar {
         readonly ExplorerTrayService explorerTrayService;
         readonly NotificationArea notificationArea;
 
-        // these colours are aproximations
-        readonly Color BackgroundColour = Color.FromArgb(0x99, 0, 0, 0);
-        readonly Color HoverColour = Color.FromArgb(26, 248, 248, 248);
-        readonly Color SelectColour = Color.FromArgb(37, 254, 254, 254);
 
         public MainWindow() {
             DataContext = this;
@@ -47,7 +43,7 @@ namespace trayOnlyBar {
             notificationArea.Initialize();
 
             foreach (NotifyIcon icon in notificationArea.AllIcons) {
-                trayItems.Children.Add(AddItemToTray(icon));
+                trayItems.Children.Add(new TrayIcon(icon));
             }
             notificationArea.AllIcons.CollectionChanged += AllIcons_CollectionChanged;
 
@@ -59,55 +55,12 @@ namespace trayOnlyBar {
             // TODO: only change the element that changed
             trayItems.Children.Clear();
             foreach (NotifyIcon icon in (ICollectionView)sender) {
-                trayItems.Children.Add(AddItemToTray(icon));
+                trayItems.Children.Add(new TrayIcon(icon));
             }
         }
 
         private void ShellLogger_Log(object sender, LogEventArgs e) {
             Console.WriteLine(e.ToString());
-        }
-
-        Panel AddItemToTray(NotifyIcon icon) {
-            Panel trayIcon = new StackPanel();
-            Panel trayIconImgContainer = new StackPanel {
-                Margin = new Thickness(3, 11, 3, 11)
-            };
-
-            Image image = new Image {
-                Source = icon.Icon,
-                Height = trayIcon.Height,
-            };
-
-            trayIcon.MouseEnter += TrayIcon_MouseEnter;
-            trayIcon.MouseLeave += TrayIcon_MouseLeave;
-            trayIcon.MouseDown += TrayIcon_MouseDown;
-            trayIcon.MouseUp += TrayIcon_MouseUp;
-
-            trayIconImgContainer.Children.Add(image);
-            trayIcon.Children.Add(trayIconImgContainer);
-
-            return trayIcon;
-        }
-
-        private void TrayIcon_MouseUp(object sender, MouseButtonEventArgs e) {
-            Panel trayIcon = (Panel)sender;
-            trayIcon.Background = null;
-        }
-
-        private void TrayIcon_MouseDown(object sender, MouseButtonEventArgs e) {
-            Panel trayIcon = (Panel)sender;
-            trayIcon.Background = new SolidColorBrush(SelectColour);
-        }
-
-        private void TrayIcon_MouseLeave(object sender, MouseEventArgs e) {
-            Panel trayIcon = (Panel)sender;
-            trayIcon.Background = null;
-
-        }
-
-        private void TrayIcon_MouseEnter(object sender, MouseEventArgs e) {
-            Panel trayIcon = (Panel)sender;
-            trayIcon.Background = new SolidColorBrush(HoverColour);
         }
 
         ~MainWindow() {
